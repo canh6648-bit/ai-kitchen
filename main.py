@@ -423,44 +423,58 @@ def suggest_recipes(request: IngredientRequest):
     if not request.ingredients:
         return {"status": "success", "data": []}
 
-    # Chuẩn hóa tên nguyên liệu trước khi tìm database.
-    # Ví dụ: Ca_Rot / ca_rot / ca rot đều thành "Cà rốt"; Trung thành "Trứng gà".
     normalized_map = {}
+
     for item in request.ingredients:
         item.name = canonical_name(item.name)
+
         if not item.name:
             continue
-        key = _key_name(item.name)
-        if key not in normalized_map:
-            normalized_map[key] = item.name
-    ingredient_names = list(normalized_map.values())
-    if not ingredient_names:
-        return {"status": "success", "data": [], "message": "Chưa có nguyên liệu hợp lệ"}
-    format_strings = ','.join(['%s'] * len(ingredient_names))
 
-    # Lấy các món có trùng ít nhất 1 nguyên liệu, sau đó tự chấm điểm.
-    # Nếu có món đủ nguyên liệu chính trong database => trả nhiều món database phù hợp.
-    # Gemini chỉ hỗ trợ thay thế phần thiếu / chỉnh hướng dẫn, không tạo card trùng.
+        key = _key_name(item.name)
+
+        if key not in normalized_map:
+            normalized_map[key] = item.name.strip()
+
+    ingredient_names = list(normalized_map.values())
+
+    if not ingredient_names:
+        return {
+            "status": "success",
+            "data": [],
+            "message": "Chưa có nguyên liệu hợp lệ"
+        }
+
+    conditions = " OR ".join(["i.name LIKE %s"] * len(ingredient_names))
+
     query = f"""
         SELECT DISTINCT r.id, r.name, r.instructions, r.image_url
         FROM recipes r
         WHERE EXISTS (
-            SELECT 1 FROM recipe_ingredients ri
+            SELECT 1
+            FROM recipe_ingredients ri
             JOIN ingredients i ON ri.ingredient_id = i.id
-            WHERE ri.recipe_id = r.id AND i.name IN ({format_strings})
+            WHERE ri.recipe_id = r.id
+            AND ({conditions})
         )
         LIMIT 100
     """
-    db_recipes = fetch_all(query, tuple(ingredient_names))
-    analyzed_recipes = [analyze_database_recipe(r, request.ingredients) for r in db_recipes]
 
-    database_matches = [r for r in analyzed_recipes if len(r.get("main_missing", [])) == 0]
+    params = tuple([f"%{name.strip()}%" for name in ingredient_names])
+
+    db_recipes = fetch_all(query, params)
+
+    analyzed_recipes = [
+        analyze_database_recipe(r, request.ingredients)
+        for r in db_recipes
+    ]
+
+    database_matches = [
+        r for r in analyzed_recipes
+        if len(r.get("main_missing", [])) == 0
+    ]
+
     if database_matches:
-        # Có nhiều nguyên liệu thì trả về NHIỀU món đủ nguyên liệu chính, thay vì chỉ 1 món.
-        # Sắp xếp ưu tiên:
-        # 1) Điểm phù hợp cao
-        # 2) Match được nhiều nguyên liệu người dùng có
-        # 3) Ít thiếu nguyên liệu phụ hơn
         sorted_matches = sorted(
             database_matches,
             key=lambda x: (
@@ -474,34 +488,48 @@ def suggest_recipes(request: IngredientRequest):
         result_recipes = []
         seen_recipe_ids = set()
 
-        # Giới hạn 8 món để giao diện không bị quá dài và API không quá chậm.
         for recipe in sorted_matches[:8]:
             if recipe.get("id") in seen_recipe_ids:
                 continue
+
             seen_recipe_ids.add(recipe.get("id"))
 
-            # Mặc định đã là món database đủ nguyên liệu chính.
             recipe["source"] = "database_verified"
             recipe["alternatives"] = []
             recipe["note"] = "Món này đủ nguyên liệu chính trong database."
 
-            # Chỉ cần Gemini hỗ trợ khi thiếu nguyên liệu phụ hoặc cần chỉnh khẩu phần.
-            # Nếu Gemini lỗi thì vẫn trả món database bình thường.
             try:
-                assist = ask_gemini_for_database_assist(recipe, request.ingredients, request.servings)
+                assist = ask_gemini_for_database_assist(
+                    recipe,
+                    request.ingredients,
+                    request.servings
+                )
+
                 recipe["instructions"] = assist.get("instructions") or recipe.get("instructions")
                 recipe["alternatives"] = assist.get("alternatives", [])
                 recipe["note"] = assist.get("note") or recipe["note"]
-                recipe["match_score"] = assist.get("match_score", recipe.get("match_score", 90))
+                recipe["match_score"] = assist.get(
+                    "match_score",
+                    recipe.get("match_score", 90)
+                )
+
             except Exception as e:
                 print(f"Lỗi Gemini hỗ trợ món database {recipe.get('name')}:", e)
+
                 if recipe.get("optional_missing"):
-                    recipe["note"] = "Món này đủ nguyên liệu chính. Một vài nguyên liệu phụ có thể thiếu, bạn có thể bỏ qua hoặc thay thế."
+                    recipe["note"] = (
+                        "Món này đủ nguyên liệu chính. "
+                        "Một vài nguyên liệu phụ có thể thiếu, bạn có thể bỏ qua hoặc thay thế."
+                    )
                 else:
                     recipe["note"] = "Món này khớp với database."
 
-            # Frontend chỉ cần các field gọn; bỏ field nội bộ.
-            for k in ["recipe_ingredients", "main_missing", "optional_missing", "matched_ingredients"]:
+            for k in [
+                "recipe_ingredients",
+                "main_missing",
+                "optional_missing",
+                "matched_ingredients"
+            ]:
                 recipe.pop(k, None)
 
             result_recipes.append(recipe)
@@ -513,28 +541,50 @@ def suggest_recipes(request: IngredientRequest):
             "message": f"Tìm thấy {len(result_recipes)} món đủ nguyên liệu chính."
         }
 
-    # Nếu không có món nào đủ nguyên liệu chính, mới để Gemini sáng tạo / điều chỉnh món.
     try:
-        ai_recipe = ask_gemini_for_pro_recipe(request.ingredients, request.servings, analyzed_recipes if analyzed_recipes else None)
-        return {"status": "success", "data": [ai_recipe], "source": ai_recipe.get("source")}
+        ai_recipe = ask_gemini_for_pro_recipe(
+            request.ingredients,
+            request.servings,
+            analyzed_recipes if analyzed_recipes else None
+        )
+
+        return {
+            "status": "success",
+            "data": [ai_recipe],
+            "source": ai_recipe.get("source")
+        }
+
     except Exception as e:
         print("Lỗi Gemini:", e)
-        # Không fallback về món thiếu nguyên liệu chính nữa, vì sẽ gây hiểu nhầm
-        # kiểu chỉ có Su hào nhưng lại hiện "Thịt lợn xào su hào".
+
         first = request.ingredients[0]
-        simple_name = f"{first.name} chế biến đơn giản"
+
         simple_recipe = {
-            "name": simple_name,
-            "instructions": f"1. Sơ chế {first.name} sạch sẽ.\n2. Nếu có tỏi/hành thì phi thơm, nếu không có thì luộc hoặc xào đơn giản.\n3. Nêm muối, nước mắm hoặc gia vị vừa ăn.\n4. Dùng nóng.",
+            "name": f"{first.name} chế biến đơn giản",
+            "instructions": (
+                f"1. Sơ chế {first.name} sạch sẽ.\n"
+                f"2. Nếu có tỏi/hành thì phi thơm, nếu không có thì luộc hoặc xào đơn giản.\n"
+                f"3. Nêm muối, nước mắm hoặc gia vị vừa ăn.\n"
+                f"4. Dùng nóng."
+            ),
             "image_url": f"https://placehold.co/600x400?text={first.name.replace(' ', '+')}",
-            "note": "Không có món database nào đủ nguyên liệu chính, nên hệ thống gợi ý món đơn giản từ nguyên liệu bạn đang có.",
+            "note": (
+                "Không có món database nào đủ nguyên liệu chính, "
+                "nên hệ thống gợi ý món đơn giản từ nguyên liệu bạn đang có."
+            ),
             "source": "simple_fallback",
             "match_score": 60,
             "missing_ingredients": [],
-            "alternatives": ["Có thể thêm tỏi, hành lá hoặc tiêu nếu có để món thơm hơn"]
+            "alternatives": [
+                "Có thể thêm tỏi, hành lá hoặc tiêu nếu có để món thơm hơn"
+            ]
         }
-        return {"status": "success", "data": [simple_recipe], "source": "simple_fallback"}
 
+        return {
+            "status": "success",
+            "data": [simple_recipe],
+            "source": "simple_fallback"
+        }
 @app.post("/api/detect-image")
 async def detect_ingredients_from_image(file: UploadFile = File(...)):
     if model is None:

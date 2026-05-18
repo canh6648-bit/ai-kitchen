@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gợi Ý Món Ăn Thông Minh</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f8fb;--card:#ffffff;--text:#0f172a;--muted:#64748b;--line:#e2e8f0;--primary:#22c55e;--primary2:#16a34a;--blue:#2563eb;--orange:#f97316;--danger:#ef4444;--shadow:0 18px 50px rgba(15,23,42,.08);--radius:24px;--sidebar:260px
+}
+body.dark{--bg:#0b1220;--card:#111827;--text:#f8fafc;--muted:#94a3b8;--line:#263244;--shadow:0 18px 50px rgba(0,0,0,.35)}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top left,rgba(34,197,94,.12),transparent 35%),var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);min-height:100vh}button,input,select{font-family:inherit}button{border:0;cursor:pointer;font-weight:800;border-radius:16px;transition:.18s}button:hover{transform:translateY(-1px)}
+.sidebar{position:fixed;left:0;top:0;width:var(--sidebar);height:100vh;background:#0f172a;color:white;padding:24px 16px;z-index:20;box-shadow:8px 0 30px rgba(0,0,0,.16)}.brand{display:flex;align-items:center;gap:12px;padding:8px 10px 22px}.brand-icon{width:44px;height:44px;border-radius:16px;background:linear-gradient(135deg,#22c55e,#86efac);display:grid;place-items:center;font-size:24px}.brand h2{margin:0;font-size:20px}.brand p{margin:3px 0 0;color:#94a3b8;font-size:12px}.nav a{display:flex;align-items:center;gap:10px;text-decoration:none;color:#cbd5e1;padding:13px 14px;border-radius:16px;margin:6px 0;font-weight:700}.nav a:hover,.nav a.active{background:rgba(255,255,255,.09);color:white}.logout{margin-top:28px;color:#fecaca!important}.hello{font-size:12px;color:#94a3b8;padding:0 12px 12px}
+.main{margin-left:var(--sidebar);padding:28px;max-width:1240px}.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.topbar h1{margin:0;font-size:30px;letter-spacing:-.8px}.topbar p{margin:6px 0 0;color:var(--muted)}.toggle-dark{background:var(--card);color:var(--text);border:1px solid var(--line);padding:12px 16px;box-shadow:var(--shadow)}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}.card{background:rgba(255,255,255,.8);background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px}.card h3{margin:0 0 14px;font-size:18px}.upload{border:1.5px dashed var(--line);border-radius:22px;padding:24px;text-align:center;background:rgba(34,197,94,.05)}#imageInput{display:none}.upload-label{display:inline-flex;gap:10px;align-items:center;background:linear-gradient(135deg,var(--primary),var(--primary2));color:white;padding:14px 18px;border-radius:16px;font-weight:800;cursor:pointer}.preview{display:none;width:100%;max-height:280px;object-fit:cover;border-radius:18px;margin-top:16px}.btn-ai,.btn-search{width:100%;padding:15px 18px;color:white;margin-top:14px}.btn-ai{background:#2563eb}.btn-search{background:linear-gradient(135deg,#fb923c,#f97316);font-size:16px}.form-row{display:grid;grid-template-columns:1fr 95px 100px 86px;gap:10px}.form-row input,.form-row select,.servings{border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:16px;padding:13px 14px;outline:none;font-weight:700}.form-row input:focus,.form-row select:focus,.servings:focus{border-color:var(--primary)}.btn-add{background:var(--primary);color:white}.serving-row{display:flex;gap:10px;align-items:center;margin-bottom:14px}.serving-row label{font-weight:800;color:var(--muted)}.servings{width:120px}.tags{display:flex;flex-wrap:wrap;gap:8px;min-height:48px;margin-top:16px;padding-top:16px;border-top:1px dashed var(--line)}.tag{display:inline-flex;align-items:center;gap:8px;background:rgba(34,197,94,.12);color:var(--primary2);border:1px solid rgba(34,197,94,.22);padding:9px 12px;border-radius:999px;font-weight:800;font-size:13px}.tag b{color:var(--text)}.tag span{color:var(--danger);cursor:pointer}.empty{color:var(--muted);font-style:italic;font-size:14px}.loading{display:none;color:var(--orange);font-weight:800;text-align:center;margin:12px 0 0}.section{display:none;margin-top:22px}.recipe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}.recipe-card{background:var(--card);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer;transition:.18s}.recipe-card:hover{transform:translateY(-5px)}.recipe-card img{height:165px;width:100%;object-fit:cover;background:#e2e8f0}.recipe-body{padding:16px}.recipe-body h3{margin:10px 0 8px}.badges{display:flex;flex-wrap:wrap;gap:6px}.badge{font-size:12px;font-weight:900;padding:6px 9px;border-radius:999px;background:#dbeafe;color:#1d4ed8}.badge.ai{background:#fef3c7;color:#b45309}.badge.good{background:#dcfce7;color:#15803d}.badge.miss{background:#fee2e2;color:#b91c1c}.note{color:var(--muted);font-size:13px;line-height:1.5}.detail{display:none;margin-top:22px}.detail-img{width:100%;max-height:400px;object-fit:cover;border-radius:22px}.detail-actions{display:flex;gap:10px;margin-top:14px}.btn-back{background:#64748b;color:white;padding:12px 16px}.btn-save{background:var(--primary);color:white;padding:12px 16px;flex:1}.btn-fav{background:#ef4444;color:white;padding:12px 16px;flex:1}.info-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:16px 0}.info-box{background:var(--bg);border:1px solid var(--line);border-radius:18px;padding:14px}.info-box b{display:block;margin-bottom:8px}.history-grid .recipe-card{cursor:pointer}.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}.stat{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:22px;padding:20px}.stat h2{margin:0;font-size:34px}.stat p{margin:6px 0 0;color:var(--muted);font-weight:700}.mini-chart{display:flex;align-items:end;gap:12px;height:180px;margin-top:12px}.bar-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:end;height:100%;gap:8px}.bar{width:100%;max-width:48px;min-height:8px;border-radius:14px 14px 6px 6px;background:linear-gradient(180deg,var(--primary),var(--primary2));box-shadow:0 10px 22px rgba(34,197,94,.22)}.bar-zero{background:var(--line);box-shadow:none}.bar-num{font-weight:900;color:var(--text);font-size:13px}.bar-label{font-size:12px;color:var(--muted);font-weight:800}.mobile-menu{display:none;position:fixed;top:16px;left:16px;z-index:30;background:var(--primary);color:white;padding:11px 13px}
+@media(max-width:860px){.mobile-menu{display:block}.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}.main{margin-left:0;padding:72px 16px 24px}.grid{grid-template-columns:1fr}.topbar{align-items:flex-start;gap:12px}.topbar h1{font-size:25px}.form-row{grid-template-columns:1fr 1fr}.btn-add{grid-column:1/-1;padding:13px}.detail-actions{flex-direction:column}}
+</style>
+</head>
+<body>
+<button class="mobile-menu" onclick="toggleMenu()">☰</button>
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><div class="brand-icon">🍳</div><div><h2>Gợi ý món ăn</h2><p>Nấu ăn thông minh</p></div></div>
+  <div class="hello" id="helloUser">Đang tải...</div>
+  <nav class="nav">
+    <a href="#" class="active" onclick="showHome()">🏠 Trang chủ</a>
+    <a href="#" onclick="showHistory()">📜 Lịch sử</a>
+    <a href="#" onclick="showFavorites()">❤️ Yêu thích</a>
+    <a href="#" onclick="showStats()">📊 Thống kê</a>
+    <a href="#" onclick="clearIngredients()">🧹 Xóa nguyên liệu</a>
+    <a class="logout" href="auth.html">🚪 Đăng xuất</a>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div><h1>Hôm nay nấu gì?</h1><p>Quét ảnh, nhập nguyên liệu và gợi ý món phù hợp.</p></div>
+    <button class="toggle-dark" onclick="toggleDark()" id="darkBtn">🌙 Dark mode</button>
+  </div>
+
+  <section id="homeSection" class="grid">
+    <div class="card">
+      <h3>📸 Quét ảnh nguyên liệu</h3>
+      <div class="upload">
+        <label for="imageInput" class="upload-label">📷 Chọn ảnh / Chụp ảnh</label>
+        <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)">
+        <img id="preview" class="preview" alt="Ảnh xem trước">
+        <button class="btn-ai" onclick="detectIngredients()">🤖 Quét bằng AI</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🥬 Nhập nguyên liệu</h3>
+      <div class="serving-row"><label>Khẩu phần</label><select id="servings" class="servings"><option value="1">1 người</option><option value="2" selected>2 người</option><option value="3">3 người</option><option value="4">4 người</option><option value="5">5 người</option></select></div>
+      <div class="form-row">
+        <input id="manualInput" list="ingredientSuggestions" placeholder="Tên nguyên liệu..." onkeypress="handleEnter(event)">
+        <datalist id="ingredientSuggestions"></datalist>
+        <input type="number" id="countInput" min="0.1" step="0.1" value="1" onkeypress="handleEnter(event)">
+        <select id="unitInput"><option>quả</option><option>củ</option><option>cây</option><option>con</option><option>miếng</option><option>bìa</option><option>túi</option><option>g</option><option>kg</option><option>ml</option><option>cái</option></select>
+        <button class="btn-add" onclick="addIngredient()">Thêm</button>
+      </div>
+      <div class="tags" id="tags-container"><span class="empty">Chưa có nguyên liệu nào...</span></div>
+      <button class="btn-search" onclick="searchRecipes()">🥘 Gợi ý món ăn Pro</button>
+      <p id="loading" class="loading">⏳ Đang xử lý...</p>
+    </div>
+  </section>
+
+  <section id="recipesSection" class="section"><h2 id="recipesTitle">✨ Món ăn gợi ý</h2><div class="recipe-grid" id="recipeGrid"></div></section>
+  <section id="detailSection" class="detail card"><button class="btn-back" onclick="backToList()">⬅ Quay lại</button><div id="detailContent"></div></section>
+  <section id="historySection" class="section"><h2>📜 Lịch sử món ăn</h2><div class="recipe-grid history-grid" id="historyGrid"></div></section>
+  <section id="favoritesSection" class="section"><h2>❤️ Món yêu thích</h2><div class="recipe-grid" id="favoritesGrid"></div></section>
+  <section id="statsSection" class="section">
+    <h2>📊 Thống kê của bạn</h2>
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="card" style="margin-top:16px">
+      <h3>📈 Biểu đồ mini 7 ngày gần nhất</h3>
+      <div id="miniChart" class="mini-chart"></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>Gần đây</h3>
+      <div id="recentList" class="note"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const API_BASE = "http://127.0.0.1:8000/api";
+let currentIngredients = [];
+let currentViewingRecipe = null;
+let lastRecipes = [];
+
+window.onload = () => {
+  loadIngredientSuggestions();
+  const name = localStorage.getItem("user_name");
+  document.getElementById("helloUser").innerText = name ? `Xin chào, ${name}` : "Bạn đang dùng khách";
+  if(localStorage.getItem("theme")==="dark") document.body.classList.add("dark");
+  updateDarkBtn();
+};
+function toggleMenu(){document.getElementById('sidebar').classList.toggle('open')}
+function toggleDark(){document.body.classList.toggle('dark');localStorage.setItem('theme',document.body.classList.contains('dark')?'dark':'light');updateDarkBtn()}
+function updateDarkBtn(){document.getElementById('darkBtn').innerText=document.body.classList.contains('dark')?'☀️ Light mode':'🌙 Dark mode'}
+function hideAll(){['recipesSection','detailSection','historySection','favoritesSection','statsSection'].forEach(id=>document.getElementById(id).style.display='none');document.getElementById('homeSection').style.display='none'}
+function showHome(){hideAll();document.getElementById('homeSection').style.display='grid'}
+function normalizeName(v){v=(v||'').trim();return v?v.charAt(0).toUpperCase()+v.slice(1).toLowerCase():''}
+function formatCount(n){const x=Number(n);return Number.isInteger(x)?String(x):String(x.toFixed(1)).replace('.0','')}
+function unitByName(name){return {"Trứng gà":"quả","Cà chua":"quả","Cà rốt":"củ","Tỏi":"củ","Súp lơ":"cây","Tôm tươi":"con","Đậu phụ":"bìa","Nấm kim châm":"túi","Thịt bò":"g","Ức gà":"g"}[name]||'cái'}
+function addIngredient(item=null){
+  const input=document.getElementById('manualInput'), countInput=document.getElementById('countInput'), unitInput=document.getElementById('unitInput');
+  let name,count,unit;
+  if(item){name=normalizeName(item.name);count=Number(item.count||1);unit=item.unit||unitByName(name)} else {name=normalizeName(input.value);count=Number(countInput.value||1);unit=unitInput.value||unitByName(name)}
+  if(!name)return;
+  const found=currentIngredients.find(x=>x.name.toLowerCase()===name.toLowerCase()&&x.unit===unit);
+  if(found)found.count=Number(found.count)+count;else currentIngredients.push({name,count,unit});
+  renderTags(); input.value=''; countInput.value=1; input.focus();
+}
+function handleEnter(e){if(e.key==='Enter')addIngredient()}
+function renderTags(){const c=document.getElementById('tags-container'); if(!currentIngredients.length){c.innerHTML='<span class="empty">Chưa có nguyên liệu nào...</span>';return} c.innerHTML=''; currentIngredients.forEach((i,idx)=>{const s=document.createElement('div');s.className='tag';s.innerHTML=`${i.name}: <b>${formatCount(i.count)} ${i.unit}</b> <span onclick="removeIngredient(${idx})">✕</span>`;c.appendChild(s)})}
+function removeIngredient(i){currentIngredients.splice(i,1);renderTags()}
+function clearIngredients(){currentIngredients=[];renderTags()}
+function previewImage(e){const p=document.getElementById('preview'); if(e.target.files[0]){p.src=URL.createObjectURL(e.target.files[0]);p.style.display='block'}}
+function setLoading(show,msg='⏳ Đang xử lý...'){const l=document.getElementById('loading');l.innerText=msg;l.style.display=show?'block':'none'}
+async function loadIngredientSuggestions(){try{const r=await fetch(`${API_BASE}/ingredients`);const d=await r.json();const dl=document.getElementById('ingredientSuggestions');dl.innerHTML='';(d.data||[]).forEach(i=>{const o=document.createElement('option');o.value=i.name;dl.appendChild(o)})}catch(e){console.log(e)}}
+async function detectIngredients(){const f=document.getElementById('imageInput'); if(!f.files.length)return alert('Vui lòng chọn ảnh!'); const fd=new FormData();fd.append('file',f.files[0]);setLoading(true,'🤖 AI đang quét ảnh...');try{const r=await fetch(`${API_BASE.replace('/api','')}/api/detect-image`,{method:'POST',body:fd});const d=await r.json();setLoading(false);if(d.status==='success'&&d.detected_ingredients?.length){d.detected_ingredients.forEach(addIngredient);alert('Đã thêm nguyên liệu AI nhận diện được!')}else alert('AI không nhận diện được nguyên liệu.')}catch(e){setLoading(false);alert('Lỗi quét ảnh. Kiểm tra backend và file best.pt')}}
+async function searchRecipes(){if(!currentIngredients.length)return alert('Vui lòng nhập nguyên liệu trước!');setLoading(true,'🥘 Đang kiểm tra nguyên liệu và đưa ra món ăn , vui lòng đợi...');try{const r=await fetch(`${API_BASE}/suggest-recipes`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ingredients:currentIngredients,servings:Number(document.getElementById('servings').value)})});const d=await r.json();setLoading(false);if(d.status==='success'&&d.data?.length){lastRecipes=d.data;showRecipeCards(d.data,'✨ Món ăn gợi ý Pro')}else alert(d.message||'Không tìm thấy món phù hợp')}catch(e){setLoading(false);alert('Lỗi kết nối backend!')}}
+function badgeSource(r){return r.source==='gemini_ai'?'<span class="badge ai">Gemini AI</span>':r.source==='database_gemini'?'<span class="badge ai">DB + Gemini</span>':r.source==='database_verified'?'<span class="badge">Database Verified</span>':r.source==='database_partial'?'<span class="badge miss">Database gần khớp</span>':'<span class="badge">Database</span>'}
+function shortList(arr){if(!arr)return ''; if(typeof arr==='string')return arr; return arr.join(', ')}
+function showRecipeCards(recipes,title){hideAll();document.getElementById('homeSection').style.display='grid';document.getElementById('recipesSection').style.display='block';document.getElementById('recipesTitle').innerText=title;const g=document.getElementById('recipeGrid');g.innerHTML='';recipes.forEach(r=>{const card=document.createElement('div');card.className='recipe-card';card.onclick=()=>showDetail(r);card.innerHTML=`<img src="${r.image_url||'https://via.placeholder.com/600x400?text=Recipe'}" onerror="this.src='https://via.placeholder.com/600x400?text=Recipe'"><div class="recipe-body"><div class="badges">${badgeSource(r)}<span class="badge good">${r.match_score||80}% phù hợp</span>${(r.missing_ingredients||[]).length?'<span class="badge miss">Có thiếu</span>':''}</div><h3>${r.name}</h3><p class="note">${r.note||'Xem công thức chi tiết'}</p></div>`;g.appendChild(card)})}
+function showDetail(r){currentViewingRecipe=r;hideAll();document.getElementById('detailSection').style.display='block';const missing=shortList(r.missing_ingredients)||'Không có hoặc không đáng kể';const alt=shortList(r.alternatives)||'Không cần thay thế';document.getElementById('detailContent').innerHTML=`<h1>${r.name}</h1><img class="detail-img" src="${r.image_url||'https://via.placeholder.com/600x400?text=Recipe'}" onerror="this.src='https://via.placeholder.com/600x400?text=Recipe'"><div class="badges" style="margin-top:14px">${badgeSource(r)}<span class="badge good">${r.match_score||80}% phù hợp</span></div><div class="info-list"><div class="info-box"><b>⚠️ Thiếu nguyên liệu</b><span class="note">${missing}</span></div><div class="info-box"><b>🔁 Gợi ý thay thế</b><span class="note">${alt}</span></div><div class="info-box"><b>📝 Ghi chú</b><span class="note">${r.note||'Không có ghi chú'}</span></div></div><div class="info-box"><b>📖 Hướng dẫn</b><p style="line-height:1.8">${(r.instructions||'Chưa có hướng dẫn').replace(/\n/g,'<br>')}</p></div><div class="detail-actions"><button class="btn-save" onclick="finishCooking()">✅ Đã hoàn thành món ăn </button><button class="btn-fav" onclick="saveFavorite()">❤️ Lưu vào yêu thích</button></div>`;window.scrollTo(0,0)}
+function backToList(){if(lastRecipes.length)showRecipeCards(lastRecipes,'✨ Món ăn gợi ý Pro');else showHome()}
+function ingredientsText(){return currentIngredients.map(i=>`${i.name}: ${formatCount(i.count)} ${i.unit}`).join(', ')}
+function recipePayload(){const r=currentViewingRecipe||{};return {user_id:Number(localStorage.getItem('user_id')),recipe_name:r.name||'',ingredients_used:ingredientsText(),source:r.source||'database',instructions:r.instructions||'',image_url:r.image_url||'',match_score:r.match_score||null,missing_ingredients:shortList(r.missing_ingredients),alternatives:shortList(r.alternatives),note:r.note||''}}
+async function finishCooking(){if(!localStorage.getItem('user_id'))return alert('Bạn cần đăng nhập để lưu lịch sử.');try{await fetch(`${API_BASE}/save-history`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(recipePayload())});alert('Đã lưu lịch sử!')}catch(e){alert('Không thể lưu lịch sử')}}
+async function saveFavorite(){if(!localStorage.getItem('user_id'))return alert('Bạn cần đăng nhập để lưu yêu thích.');try{await fetch(`${API_BASE}/favorites`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(recipePayload())});alert('Đã lưu yêu thích!')}catch(e){alert('Không thể lưu yêu thích')}}
+function cardFromSaved(item, removable=false){const card=document.createElement('div');card.className='recipe-card';card.onclick=()=>showDetail({name:item.recipe_name,instructions:item.instructions,image_url:item.image_url,source:item.source,match_score:item.match_score,missing_ingredients:item.missing_ingredients?item.missing_ingredients.split(', '):[],alternatives:item.alternatives?item.alternatives.split(', '):[],note:item.note||`Nguyên liệu: ${item.ingredients_used}`});card.innerHTML=`<img src="${item.image_url||'https://via.placeholder.com/600x400?text=Saved'}" onerror="this.src='https://via.placeholder.com/600x400?text=Saved'"><div class="recipe-body"><div class="badges"><span class="badge">${item.source||'saved'}</span>${item.match_score?`<span class="badge good">${item.match_score}%</span>`:''}</div><h3>${item.recipe_name}</h3><p class="note">${item.ingredients_used||''}</p><p class="note">${new Date(item.created_at).toLocaleString('vi-VN')}</p>${removable?`<button onclick="event.stopPropagation();deleteFavorite(${item.id})" class="btn-back" style="background:#ef4444">Xóa</button>`:''}</div>`;return card}
+async function showHistory(){const uid=localStorage.getItem('user_id');if(!uid)return alert('Vui lòng đăng nhập!');hideAll();document.getElementById('historySection').style.display='block';const g=document.getElementById('historyGrid');g.innerHTML='<p class="note">Đang tải...</p>';try{const r=await fetch(`${API_BASE}/history/${uid}`);const d=await r.json();g.innerHTML='';if(d.data?.length)d.data.forEach(i=>g.appendChild(cardFromSaved(i)));else g.innerHTML='<p class="empty">Chưa có lịch sử.</p>'}catch(e){g.innerHTML='<p>Lỗi tải lịch sử.</p>'}}
+async function showFavorites(){const uid=localStorage.getItem('user_id');if(!uid)return alert('Vui lòng đăng nhập!');hideAll();document.getElementById('favoritesSection').style.display='block';const g=document.getElementById('favoritesGrid');g.innerHTML='<p class="note">Đang tải...</p>';try{const r=await fetch(`${API_BASE}/favorites/${uid}`);const d=await r.json();g.innerHTML='';if(d.data?.length)d.data.forEach(i=>g.appendChild(cardFromSaved(i,true)));else g.innerHTML='<p class="empty">Chưa có món yêu thích.</p>'}catch(e){g.innerHTML='<p>Lỗi tải yêu thích.</p>'}}
+async function deleteFavorite(id){if(!confirm('Xóa món yêu thích này?'))return;await fetch(`${API_BASE}/favorites/${id}`,{method:'DELETE'});showFavorites()}
+async function showStats(){
+  const uid=localStorage.getItem('user_id');
+  if(!uid)return alert('Vui lòng đăng nhập!');
+  hideAll();
+  document.getElementById('statsSection').style.display='block';
+  try{
+    const r=await fetch(`${API_BASE}/stats/${uid}`);
+    const d=await r.json();
+    const s=d.data||{};
+    const top=s.top_recipe||{recipe_name:'Chưa có',cook_count:0};
+    document.getElementById('statsGrid').innerHTML=`
+      <div class="stat"><h2>${s.total_history||0}</h2><p>🍳 Tổng món đã nấu</p></div>
+      <div class="stat"><h2 style="font-size:24px">${top.recipe_name||'Chưa có'}</h2><p>🥇 Món nấu nhiều nhất: ${top.cook_count||0} lần</p></div>
+    `;
+
+    const chart=s.mini_chart||[];
+    const max=Math.max(...chart.map(x=>Number(x.total||0)),1);
+    document.getElementById('miniChart').innerHTML=chart.map(x=>{
+      const total=Number(x.total||0);
+      const height=Math.max(8, Math.round((total/max)*130));
+      return `<div class="bar-item" title="${x.date}: ${total} món">
+        <div class="bar-num">${total}</div>
+        <div class="bar ${total===0?'bar-zero':''}" style="height:${height}px"></div>
+        <div class="bar-label">${x.label}</div>
+      </div>`;
+    }).join('') || '<p class="empty">Chưa có dữ liệu biểu đồ.</p>';
+
+    document.getElementById('recentList').innerHTML=(s.recent||[])
+      .map(x=>`• ${x.recipe_name} - ${new Date(x.created_at).toLocaleString('vi-VN')}`)
+      .join('<br>') || 'Chưa có dữ liệu.';
+  }catch(e){
+    document.getElementById('statsGrid').innerHTML='<p>Lỗi tải thống kê.</p>';
+    document.getElementById('miniChart').innerHTML='';
+  }
+}
+</script>
+</body>
+</html>
